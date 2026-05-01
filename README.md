@@ -1,4 +1,4 @@
-# 🎓 Cathedra — Cómo ejecutar en GitHub Codespaces
+#  Cathedra — Cómo ejecutar en GitHub Codespaces
 
 ### 1. Entra a la carpeta del proyecto
 
