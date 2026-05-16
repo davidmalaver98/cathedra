@@ -47,5 +47,5 @@ def registro_view(request):
                 password=password1
             )
             login(request, user) 
-            return redirect('landing')
+            return redirect('landing.html')
     return render(request, 'login.html', {'error': error})
