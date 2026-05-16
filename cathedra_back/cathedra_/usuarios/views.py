@@ -24,7 +24,7 @@ def logout_view(request):
 
 @login_required
 def inicio_view(request):
-    return render(request, 'inicio.html')
+    return render(request, 'landing.html')
 
 def registro_view(request):
     error = None
