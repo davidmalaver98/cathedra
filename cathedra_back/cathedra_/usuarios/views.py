@@ -1,51 +1,50 @@
-
-
-from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.decorators import login_required
-from django.contrib.auth.models import User
+from django.contrib.auth.hashers import check_password, make_password
 from django.shortcuts import render, redirect
+from usuarios.models import Usuario
 
 def login_view(request):
     error = None
     if request.method == 'POST':
-        username = request.POST['username']
+        correo = request.POST['username']
         password = request.POST['password']
-        user = authenticate(request, username=username, password=password)
-        if user is not None:
-            login(request, user)
-            return redirect('inicio')
-        else:
+        try:
+            usuario = Usuario.objects.get(correo=correo)
+            if check_password(password, usuario.contrasena):
+                request.session['usuario_id'] = usuario.id_usuario
+                request.session['usuario_nombre'] = usuario.nombre
+                return redirect('landing')
+            else:
+                error = 'Usuario o contraseña incorrectos'
+        except Usuario.DoesNotExist:
             error = 'Usuario o contraseña incorrectos'
     return render(request, 'login.html', {'error': error})
 
 def logout_view(request):
-    logout(request)
-    return redirect('login')
-
-@login_required
-def inicio_view(request):
-    return render(request, 'landing.html')
+    request.session.flush()
+    return redirect('landing')
 
 def registro_view(request):
     error = None
     if request.method == 'POST':
-        username = request.POST['username']
-        email = request.POST['email']
-        first_name = request.POST['first_name']
+        nombre = request.POST['first_name']
+        correo = request.POST['email']
         password1 = request.POST['password1']
         password2 = request.POST['password2']
 
         if password1 != password2:
             error = 'Las contraseñas no coinciden'
-        elif User.objects.filter(username=username).exists():
-            error = 'El usuario ya existe'
+        elif Usuario.objects.filter(correo=correo).exists():
+            error = 'El correo ya está registrado'
         else:
-            User.objects.create_user(
-                username=username,
-                email=email,
-                first_name=first_name,
-                password=password1
+            Usuario.objects.create(
+                nombre=nombre,
+                apellido='',
+                correo=correo,
+                contrasena=make_password(password1),
             )
-            login(request, user) 
-            return redirect('landing.html')
+            # Buscar el usuario recién creado y guardarlo en sesión
+            usuario = Usuario.objects.get(correo=correo)
+            request.session['usuario_id'] = usuario.id_usuario
+            request.session['usuario_nombre'] = usuario.nombre
+            return redirect('landing')
     return render(request, 'login.html', {'error': error})

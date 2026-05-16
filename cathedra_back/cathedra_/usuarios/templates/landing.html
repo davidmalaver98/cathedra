@@ -625,9 +625,14 @@ footer {
   </ul>
 
   <div class="nav-actions">
-    <a href="/login/" class="btn-ghost">Iniciar sesión</a>
-    <a href="/registro/" class="btn-solid">Registrarse →</a>
-  </div>
+  {% if request.session.usuario_nombre %}
+    <span style="font-size:13px;color:var(--gray-600)">{{ request.session.usuario_nombre }}</span>
+    <a href="{% url 'logout' %}" class="btn-ghost">Cerrar sesión</a>
+  {% else %}
+    <a href="{% url 'login' %}" class="btn-ghost">Iniciar sesión</a>
+    <a href="{% url 'registro' %}" class="btn-solid">Registrarse →</a>
+  {% endif %}
+</div>
 </nav>
 
 <!-- HERO -->
